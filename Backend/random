@@ -1,0 +1,92 @@
+// server.js or app.js
+const express = require('express');
+const multer = require('multer');
+const csvParser = require('csv-parser');
+const fs = require('fs');
+const prisma = require('@prisma/client').PrismaClient;
+const path = require('path');
+
+const app = express();
+const port = 3000;
+
+// Initialize Prisma Client
+const prismaClient = new prisma();
+
+// Set up multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/'); // Make sure this folder exists
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  },
+});
+const upload = multer({ storage: storage });
+
+// Middleware to parse JSON body (for post requests)
+app.use(express.json());
+
+// Route to upload CSV file and create a test
+app.post('/upload-csv', upload.single('csvFile'), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).send('No file uploaded.');
+  }
+
+  // Read and parse the CSV file
+  const questions = [];
+  fs.createReadStream(req.file.path)
+    .pipe(csvParser())
+    .on('data', (row) => {
+      questions.push(row);
+    })
+    .on('end', async () => {
+      // Create a new test in the database
+      try {
+        const { title, teacherID, branchId, subject, yearId } = req.body;
+
+        // Create the test
+        const newTest = await prismaClient.testTable.create({
+          data: {
+            title,
+            teacherID: parseInt(teacherID),
+            branchId: parseInt(branchId),
+            subject,
+            yearId: parseInt(yearId),
+            noofquestions: questions.length,
+            noofstudents: 0, // You can update this later
+            scheduledDate: new Date(), // Set it as current date or from input
+          },
+        });
+
+        // Insert the questions into the database
+        for (const question of questions) {
+          await prismaClient.questionsTable.create({
+            data: {
+              question: question['question text'],
+              optionA: question['option a'],
+              optionB: question['option b'],
+              optionC: question['option c'],
+              optionD: question['option d'],
+              correctOption: question['correct option'],
+              marks: 1, // Or any default value for marks
+              testId: newTest.id,
+            },
+          });
+        }
+
+        // Send response back to client
+        res.status(201).json({
+          message: 'Test created successfully',
+          testId: newTest.id,
+        });
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'An error occurred while processing the file.' });
+      }
+    });
+});
+
+// Start the server
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
+});
