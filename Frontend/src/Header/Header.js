@@ -15,7 +15,7 @@ const handlehome1 = () => {
   // navigate("/"); // Navigate to the home component
 };
     return (
-      <div class="flex w-full flex-row justify-between bg-gray-700 fixed top-0 left-0 right-0 py-2 ">
+      <div class="flex w-full z-10 flex-row justify-between bg-gray-700 top-0 fixed left-0 right-0 py-2 ">
   <div class="flex-1">
     <button class=" text-white font-bold py-2 px-4 ml-6 rounded"
     onClick={handlehome1}>

@@ -5,6 +5,7 @@ import Header from './Header/Header';
 import Home from './Pages/HomePage/Home'
 import Signup from './Pages/SignupPage/Signup'
 import Login from './Pages/LoginPage/Login'
+import Profile from './Pages/ProfilePage/profile'
 function App() {
   return (
     <BrowserRouter>
@@ -13,6 +14,7 @@ function App() {
     <Route path='/' element={<Home />} />
     <Route path='/signup' element={<Signup/>} />
     <Route path='/login' element={<Login/>} />
+    <Route path='/profile' element={<Profile/>} />
     </Routes>
     </BrowserRouter>
   );
