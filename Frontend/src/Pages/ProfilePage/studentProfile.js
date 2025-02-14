@@ -6,28 +6,26 @@ const ProfilePage = ({ userType }) => {
   const [editMode, setEditMode] = useState(false);
   const [updatedProfile, setUpdatedProfile] = useState({});
 
+  const branches = ["Computer Science", "Information Technology", "Mechanical Engineering"];
+  const universities = ["XYZ University", "ABC University", "LMN University"];
+  const years = ["First Year", "Second Year", "Third Year", "Final Year"];
+
   useEffect(() => {
     const fetchProfile = async () => {
-      const mockData = userType === "student" ? {
+      const mockData = {
         firstname: "John",
         lastname: "Doe",
         email: "john.doe@example.com",
         PRN: "12345678",
-        branch: "Computer Science",
-        university: "XYZ University",
-        year: "Third Year"
-      } : {
-        firstname: "Jane",
-        lastname: "Smith",
-        email: "jane.smith@example.com",
-        branch: "Information Technology",
-        university: "XYZ University"
+        branchId: "Computer Science",
+        universityId: "XYZ University",
+        yearId: "Third Year"
       };
       setProfile(mockData);
       setUpdatedProfile(mockData);
     };
     fetchProfile();
-  }, [userType]);
+  }, []);
 
   const handleEdit = () => setEditMode(true);
 
@@ -56,18 +54,30 @@ const ProfilePage = ({ userType }) => {
             <div key={key} className="relative">
               <label className="block text-gray-700 font-medium capitalize">{key.replace(/([A-Z])/g, ' $1')}</label>
               <div className="relative">
-                {key === "email" ? <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-500" /> : null}
-                {key === "PRN" ? <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-500" /> : null}
-                {key === "branch" ? <Briefcase className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-500" /> : null}
-                {key === "university" ? <School className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-500" /> : null}
-                <input
-                  type="text"
-                  name={key}
-                  value={updatedProfile[key]}
-                  onChange={handleChange}
-                  disabled={!editMode}
-                  className={`w-full pl-12 pr-4 py-3 border-2 rounded-lg transition duration-300 focus:outline-none focus:ring-2 ${editMode ? "bg-white focus:ring-blue-600" : "bg-gray-100 cursor-not-allowed"}`}
-                />
+                {key === "email" && <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-500" />}
+                {key === "PRN" && <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-500" />}
+                {key === "branchId" || key === "universityId" || key === "yearId" ? (
+                  <select
+                    name={key}
+                    value={updatedProfile[key]}
+                    onChange={handleChange}
+                    disabled={!editMode}
+                    className={`w-full pl-4 pr-4 py-3 border-2 rounded-lg transition duration-300 focus:outline-none focus:ring-2 ${editMode ? "bg-white focus:ring-blue-600" : "bg-gray-100 cursor-not-allowed"}`}
+                  >
+                    {(key === "branchId" ? branches : key === "universityId" ? universities : years).map((option) => (
+                      <option key={option} value={option}>{option}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    type="text"
+                    name={key}
+                    value={updatedProfile[key]}
+                    onChange={handleChange}
+                    disabled={!editMode}
+                    className={`w-full pl-12 pr-4 py-3 border-2 rounded-lg transition duration-300 focus:outline-none focus:ring-2 ${editMode ? "bg-white focus:ring-blue-600" : "bg-gray-100 cursor-not-allowed"}`}
+                  />
+                )}
               </div>
             </div>
           ))}
