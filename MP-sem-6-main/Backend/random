@@ -1,0 +1,104 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model UniversityTable {
+  id         Int            @id @default(autoincrement())
+  name       String
+  address    String
+  branches   BranchTable[]
+  students   StudentTable[]
+  teachers   TeacherTable[]
+}
+
+model BranchTable {
+  id          Int          @id @default(autoincrement())
+  Branchcode  String
+  Branchname  String
+  universityId Int
+  university  UniversityTable @relation(fields: [universityId], references: [id])
+  students    StudentTable[]
+  teachers    TeacherTable[]
+  tests       TestTable[]
+}
+
+model YearTable {
+  id       Int      @id @default(autoincrement())
+  name     String
+  year     Int
+  students StudentTable[]
+  tests    TestTable[]
+}
+
+model StudentTable {
+  id           Int      @id @default(autoincrement())
+  firstname    String
+  lastname     String
+  email        String @unique
+  password     String
+  PRN          String
+  branchId     Int
+  universityId Int
+  yearId       Int
+  branch       BranchTable @relation(fields: [branchId], references: [id])
+  university   UniversityTable @relation(fields: [universityId], references: [id])
+  year         YearTable @relation(fields: [yearId], references: [id])
+  results      ResultTable[]
+}
+
+model TeacherTable {
+  id           Int      @id @default(autoincrement())
+  firstname    String
+  lastname     String
+  email        String @unique
+  password     String
+  branchId     Int
+  universityId Int
+  branch       BranchTable @relation(fields: [branchId], references: [id])
+  university   UniversityTable @relation(fields: [universityId], references: [id])
+  tests        TestTable[]
+}
+
+model TestTable {
+  id            Int            @id @default(autoincrement())
+  title         String
+  teacherID     Int
+  branchId      Int
+  subject       String
+  yearId        Int
+  totalmarks    Int
+  scheduledDate DateTime
+  teacher       TeacherTable @relation(fields: [teacherID], references: [id])
+  branch        BranchTable  @relation(fields: [branchId], references: [id])
+  year          YearTable    @relation(fields: [yearId], references: [id])
+  questions     QuestionsTable[]
+  results       ResultTable[]
+}
+
+model QuestionsTable {
+  id            Int    @id @default(autoincrement())
+  question      String
+  optionA       String
+  optionB       String
+  optionC       String
+  optionD       String
+  correctOption String
+  marks         Int
+  testId        Int
+  test          TestTable @relation(fields: [testId], references: [id])
+}
+
+model ResultTable {
+  id          Int @id @default(autoincrement())
+  totalmarks  Int
+  scoredmarks Int
+  testId      Int
+  studentId   Int
+  test        TestTable  @relation(fields: [testId], references: [id])
+  student     StudentTable @relation(fields: [studentId], references: [id])
+}
