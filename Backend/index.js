@@ -17,6 +17,6 @@ app.get('/', (req, res) => {
 })
 
 app.use('/api/v1/auth', authrouter);
-app.listen(3000, () => {
-    console.log('running on 3000')
+app.listen(port, () => {
+    console.log(`running on ${port}`)
 })

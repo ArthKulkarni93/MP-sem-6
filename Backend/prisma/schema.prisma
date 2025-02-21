@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,98 +8,100 @@ datasource db {
 }
 
 model UniversityTable {
-  id Int @id @default(autoincrement())
-  name String
-  address String
-  branches BranchTable[]
-  students StudentTable[]
-  teachers TeacherTable[]
+  id         Int            @id @default(autoincrement())
+  name       String
+  address    String
+  branches   BranchTable[]
+  students   StudentTable[]
+  teachers   TeacherTable[]
 }
 
 model BranchTable {
-  id Int @id @default(autoincrement())
-  Branchcode String
-  Branchname String
+  id          Int          @id @default(autoincrement())
+  Branchcode  String
+  Branchname  String
   universityId Int
-  university_Id UniversityTable @relation(fields: [universityId], references: [id])
-  students StudentTable[]
-  teachers TeacherTable[]
-  tests TestTable[]
+  university  UniversityTable @relation(fields: [universityId], references: [id])
+  students    StudentTable[]
+  teachers    TeacherTable[]
+  tests       TestTable[]
 }
 
 model YearTable {
-  id Int @id @default(autoincrement())
-  name String
-  year Int
+  id       Int      @id @default(autoincrement())
+  name     String
+  year     Int
   students StudentTable[]
-  tests TestTable[]
+  tests    TestTable[]
 }
 
 model StudentTable {
-  id Int @id @default(autoincrement())
-  firstname String
-  lastname String
-  email String
-  password String
-  PRN String
-  branchId Int
+  id           Int      @id @default(autoincrement())
+  firstname    String
+  lastname     String
+  email        String @unique
+  password     String
+  PRN          String
+  branchId     Int
   universityId Int
-  yearId Int
-  branch_Id BranchTable @relation(fields: [branchId], references: [id])
-  university_Id UniversityTable @relation(fields: [universityId], references: [id])
-  year_Id YearTable @relation(fields: [yearId], references: [id])
-  results ResultTable[]
+  yearId       Int
+  branch       BranchTable @relation(fields: [branchId], references: [id])
+  university   UniversityTable @relation(fields: [universityId], references: [id])
+  year         YearTable @relation(fields: [yearId], references: [id])
+  results      ResultTable[]
 }
 
 model TeacherTable {
-  id Int @id @default(autoincrement())
-  firstname String
-  lastname String
-  email String
-  password String
-  branchId Int
+  id           Int      @id @default(autoincrement())
+  firstname    String
+  lastname     String
+  email        String @unique
+  password     String
+  branchId     Int
   universityId Int
-  branch_Id BranchTable @relation(fields: [branchId], references: [id])
-  university_Id UniversityTable @relation(fields: [universityId], references: [id])
-  tests TestTable[]
+  branch       BranchTable @relation(fields: [branchId], references: [id])
+  university   UniversityTable @relation(fields: [universityId], references: [id])
+  tests        TestTable[]
 }
 
 model TestTable {
-  id Int @id @default(autoincrement())
-  title String
-  teacherID Int
-  branchId Int
-  subject String
-  yearId Int
-  noofquestions Int
-  noofstudents Int
+  id            Int            @id @default(autoincrement())
+  title         String
+  teacherID     Int
+  branchId      Int
+  subject       String
+  yearId        Int
+  totalmarks    Int
+  duration      Int  // ✅ Added duration (in minutes)
   scheduledDate DateTime
-  teacher_Id TeacherTable @relation(fields: [teacherID], references: [id])
-  branch_Id BranchTable @relation(fields: [branchId], references: [id])
-  year_Id YearTable @relation(fields: [yearId], references: [id])
-  questions QuestionsTable[]
-  results ResultTable[]
+  teacher       TeacherTable @relation(fields: [teacherID], references: [id])
+  branch        BranchTable  @relation(fields: [branchId], references: [id])
+  year          YearTable    @relation(fields: [yearId], references: [id])
+  questions     QuestionsTable[]
+  results       ResultTable[]
 }
+
 
 model QuestionsTable {
-  id Int @id @default(autoincrement())
-  question String
-  optionA String
-  optionB String
-  optionC String
-  optionD String
-  correctOption String
-  marks Int
-  testId Int
-  test_Id TestTable @relation(fields: [testId], references: [id])
+  id            Int    @id @default(autoincrement())
+  queText       String  // ✅ Updated field name from `question` to `queText`
+  optionA       String
+  optionB       String
+  optionC       String
+  optionD       String
+  correctOption String  // ✅ Storing correct answer as "A", "B", "C", or "D"
+  maxMark       Int     // ✅ Updated from `marks` to `maxMark`
+  testId        Int
+  test          TestTable @relation(fields: [testId], references: [id])
 }
 
+
 model ResultTable {
-  id        Int      @id @default(autoincrement())
-  totalmarks Int
+  id          Int @id @default(autoincrement())
+  totalmarks  Int
   scoredmarks Int
-  testId     Int
-  studentId  Int
-  test_Id    TestTable  @relation(fields: [testId], references: [id])
-  student_Id StudentTable @relation(fields: [studentId], references: [id])
+  testId      Int
+  studentId   Int
+  test        TestTable  @relation(fields: [testId], references: [id])
+  student     StudentTable @relation(fields: [studentId], references: [id])
 }

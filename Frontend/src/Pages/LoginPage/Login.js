@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { Mail, KeyRound, Eye, EyeOff, LogIn } from 'lucide-react';
+import { useNavigate } from "react-router-dom";
+import axios from 'axios'; 
+import api from '../../api';
 const AdvancedLogin = () => {
   const [loginType, setLoginType] = useState('student');
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({ email: '', password: '' });
-
+  const navigate = useNavigate();
   const handleLoginTypeChange = (type) => {
     setLoginType(type);
     setFormData({ email: '', password: '' });
@@ -15,16 +18,43 @@ const AdvancedLogin = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login Data:', { ...formData, role: loginType });
+    console.log('Login Data:', { ...formData,  role: loginType  });
+    try {
+      const endpoint = loginType === "student" 
+        ? api.studentSignin.url
+        : api.adminSignin.url;
+  
+        console.log("endpoint:",endpoint);
+
+      const response = await axios.post(`${endpoint}`, { ...formData, role: loginType });
+
+      console.log("response:" , response);
+
+      if (response.status === 200) {
+        alert("Login successful!");
+        if(loginType === 'student'){
+          navigate('/student-dashboard');
+        }
+        else{
+          navigate('/admin-dashboard');
+        }
+      } else {
+        alert('Unable tO Login');
+      }
+    } catch (error) {
+      console.error("Login Error:", error.response?.data || error.message);
+      alert("Login failed! Please try again.");
+    }
   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center p-4 selection:bg-blue-200">
       <div className="w-full max-w-md bg-white shadow-2xl rounded-3xl overflow-hidden border-4 border-blue-500/10 transform transition-all hover:scale-[1.01] hover:shadow-3xl duration-300">
         <div className="flex border-b-2 border-blue-100 bg-gradient-to-r from-blue-50 to-purple-50">
-          {['student', 'teacher'].map((type) => (
+          {['student', 'admin'].map((type) => (
             <button
               key={type}
               onClick={() => handleLoginTypeChange(type)}

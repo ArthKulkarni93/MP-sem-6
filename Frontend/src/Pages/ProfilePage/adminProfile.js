@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Edit, Save, User, Mail, Briefcase, School } from "lucide-react";
+import AdminSidebar from '../../Sidebar/adminSidebar';
+import { FaBars } from 'react-icons/fa';
 
 const ProfilePage = ({ userType }) => {
   const [profile, setProfile] = useState(null);
@@ -8,6 +10,12 @@ const ProfilePage = ({ userType }) => {
 
   const branches = ["Computer Science", "Information Technology", "Mechanical Engineering"];
   const universities = ["XYZ University", "ABC University", "LMN University"];
+
+  const [isOpen, setIsOpen] = useState(false);
+  
+      const toggleSidebar = () => {
+        setIsOpen(!isOpen);
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -39,8 +47,14 @@ const ProfilePage = ({ userType }) => {
   if (!profile) return <div className="text-center text-lg font-bold">Loading...</div>;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br mt-14 p-4">
-      <div className="w-full max-w-lg bg-white shadow-lg rounded-3xl overflow-hidden border-4 border-blue-500/10 transform transition-all hover:scale-105 duration-300 p-6">
+    <div className="mt-5 bg-gray-100">
+      <FaBars 
+                onClick={toggleSidebar} 
+                className="cursor-pointer  fixed text-xl text-white ml-1 z-20 hover:text-gray-400" 
+            />
+      <AdminSidebar isOpen={isOpen} toggleSidebar={toggleSidebar} role="admin" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br mt-5 p-4">
+      <div className="w-full mt-12 max-w-lg bg-white shadow-lg rounded-3xl overflow-hidden border-4 border-blue-500/10 transform transition-all hover:scale-105 duration-300 p-6">
         <div className="flex items-center space-x-4 mb-6">
           <User className="w-12 h-12 text-blue-600" />
           <h2 className="text-2xl font-semibold text-gray-800 capitalize">{userType} Profile</h2>
@@ -97,6 +111,7 @@ const ProfilePage = ({ userType }) => {
           )}
         </div>
       </div>
+    </div>
     </div>
   );
 };

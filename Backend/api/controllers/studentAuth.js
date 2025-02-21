@@ -18,7 +18,7 @@ const jwtSecret =  process.env.jwtSecret// MUST BE SECURE IN PRODUCTION
 // Student signup route
 router.post('/signup', async (req, res) => {
     const { firstname, lastname, email, password, PRN, branchId, universityId, yearId } = req.body;
-
+    console.log("pribt",firstname)
     try {
         const existingUser = await prisma.studentTable.findFirst({
             where: { email },
@@ -28,7 +28,7 @@ router.post('/signup', async (req, res) => {
             return res.status(400).json({ msg: 'Email already exists' });
         }
 
-        const student = await prisma.studentTable.create({
+        const student = await prisma.StudentTable.create({
             data: {
                 firstname,
                 lastname,
