@@ -22,7 +22,7 @@ router.get('/tests', verifyJWT('student'), async (req, res) => {
     }
 });
 
-// Submit Test
+//submit test
 router.post('/tests/:testId/submit', verifyJWT('student'), async (req, res) => {
     const { answers } = req.body;
     let score = 0;
@@ -33,7 +33,10 @@ router.post('/tests/:testId/submit', verifyJWT('student'), async (req, res) => {
         });
 
         questions.forEach(question => {
-            if (answers[question.id] === question.correctOption) {
+            const submittedAnswer = answers[question.id]?.toString().trim().toLowerCase();  // Ensure lowercase
+            const correctAnswer = question.correctOption?.toString().trim().toLowerCase(); // Ensure lowercase
+            
+            if (submittedAnswer === correctAnswer) {
                 score += question.maxMark;
             }
         });
@@ -42,23 +45,26 @@ router.post('/tests/:testId/submit', verifyJWT('student'), async (req, res) => {
             data: {
                 testId: parseInt(req.params.testId),
                 studentId: req.student.id,
-                totalmarks: questions.reduce((sum, q) => sum + q.marks, 0),
+                // totalmarks: questions.reduce((sum, q) => sum + q.maxMark, 0),
+                totalmarks: questions.reduce((sum, q) => sum + q.maxMark , 0),
                 scoredmarks: score
             }
         });
-        
         res.json(result);
+        console.log(res);
     } catch (error) {
+        console.error("Error submitting test:", error);
         res.status(500).json({ message: 'Error submitting test' });
     }
 });
+
 
 // Get Student's Past Results
 router.get('/results', verifyJWT('student'), async (req, res) => {
     try {
         const results = await prisma.ResultTable.findMany({
             where: { studentId: req.student.id },
-            include: { test: { select: { title: true, subject: true, scheduledDate: true } } }
+            include: { test: { select: { title: true, subject: true, scheduledDate: true , duration: true } } }
         });
 
         res.json(results);
@@ -66,6 +72,33 @@ router.get('/results', verifyJWT('student'), async (req, res) => {
         res.status(500).json({ message: 'Error fetching results' });
     }
 });
+
+// Get a single test's details (for student)
+router.get('/tests/:testid', verifyJWT('student'), async (req, res) => {
+    try {
+      const test = await prisma.TestTable.findUnique({
+        where: { id: parseInt(req.params.testid) }
+      });
+      if (!test) return res.status(404).json({ message: 'Test not found' });
+      res.json(test);
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching test details' });
+    }
+  });
+  
+  // Get test questions for a student
+  router.get('/tests/:testid/questions', verifyJWT('student'), async (req, res) => {
+    try {
+      const questions = await prisma.QuestionsTable.findMany({
+        where: { testId: parseInt(req.params.testid) }
+      });
+      res.status(200).json(questions);
+    } catch (error) {
+      console.error("Error fetching questions for student:", error);
+      res.status(500).json({ message: 'Error fetching questions for student' });
+    }
+  });
+  
 
 module.exports = router;
 

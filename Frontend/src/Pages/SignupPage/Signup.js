@@ -125,17 +125,17 @@ const RoleBasedSignup = () => {
 
           <select name="branchId" value={formData.branchId} onChange={handleChange} required className="w-full border p-2 rounded">
             <option value="">Select Branch</option>
-            {branches.map(branch => <option key={branch.id} value={branch.id}>{branch.id}</option>)}
+            {branches.map(branch => <option key={branch.id} value={branch.id}>{branch.name}</option>)}
           </select>
 
           <select name="universityId" value={formData.universityId} onChange={handleChange} required className="w-full border p-2 rounded">
             <option value="">Select University</option>
-            {universities.map(uni => <option key={uni.id} value={uni.id}>{uni.id}</option>)}
+            {universities.map(uni => <option key={uni.id} value={uni.id}>{uni.name}</option>)}
           </select>
 
           {role === "student" && <select name="yearId" value={formData.yearId} onChange={handleChange} required className="w-full border p-2 rounded">
             <option value="">Select Year</option>
-            {years.map(year => <option key={year.id} value={year.id}>{year.id}</option>)}
+            {years.map(year => <option key={year.id} value={year.id}>{year.name}</option>)}
           </select>}
 
           {/* Password Field */}

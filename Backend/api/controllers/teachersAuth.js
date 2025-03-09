@@ -83,7 +83,21 @@ const verifyJWT = (req, res, next) => {
     res.status(401).json({ msg: 'Token is not valid' });
   }
 };
-
+// GET teacher (admin) profile (protected)
+router.get('/profile', verifyJWT, async (req, res) => {
+  try {
+    const teacher = await prisma.teacherTable.findUnique({
+      where: { id: req.teacherId },
+    });
+    if (!teacher) {
+      return res.status(404).json({ msg: 'Teacher not found' });
+    }
+    res.json(teacher);
+  } catch (error) {
+    console.error('Error fetching teacher profile:', error);
+    res.status(500).json({ msg: 'Error fetching teacher profile' });
+  }
+});
 // Update teacher profile (protected route)
 router.put('/update', verifyJWT, async (req, res) => {
   const { firstname, lastname, email, password, branchId, universityId } = req.body;

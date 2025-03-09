@@ -105,5 +105,18 @@ router.get('/tests/:testId/results', verifyJWT('teacher'), async (req, res) => {
         res.status(500).json({ message: 'Error fetching results' });
     }
 });
+// Fetch Questions for a Specific Test
+router.get('/tests/:testid/questions', verifyJWT('teacher'), async (req, res) => {
+    try {
+      const questions = await prisma.QuestionsTable.findMany({
+        where: { testId: parseInt(req.params.testid) }
+      });
+      res.status(200).json(questions);
+    } catch (error) {
+      console.error("Error fetching questions:", error);
+      res.status(500).json({ message: 'Error fetching questions' });
+    }
+  });
+  
 
 module.exports = router;

@@ -13,6 +13,7 @@ import AdminResults from './Admin/adminResult'
 import StudentDashboard from './Student/studentDashboard'
 import StudentExams from './Student/studentExam'
 import StudentResults from './Student/studentResult'
+import StudentTest from './Student/studentTest'
 function App() {
   return (
     <BrowserRouter>
@@ -25,10 +26,13 @@ function App() {
     <Route path='/admin-profile' element={<AdminProfile/>} />
     <Route path='/student-dashboard' element={<StudentDashboard/>} />
     <Route path='/admin-dashboard' element={<AdminDashboard/>} />
-    <Route path='/student-exams' element={<StudentExams/>} />
+     <Route path='/student-exams' element={<StudentExams/>} />
     <Route path='/admin-exams' element={<AdminExams/>} />
     <Route path='/student-results' element={<StudentResults/>} />
     <Route path='/admin-results' element={<AdminResults/>} />
+    {/* <Route path='/student-test' element={<StudentTest/>} /> */}
+     {/* Test-taking page; :testId parameter is used */}
+     <Route path='/student/test/:testId' element={<StudentTest/>} />
     </Routes>
     </BrowserRouter>
   );

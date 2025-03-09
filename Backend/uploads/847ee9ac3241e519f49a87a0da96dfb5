@@ -1,0 +1,11 @@
+queText,optionA,optionB,optionC,optionD,correctOption,maxMark
+What is the output of `cout << 2 + 3;` in C++?,2,3,5,23,C,1
+Which of these is a feature of OOP?,Encapsulation,Compilation,Interpretation,None,A,2
+What does `new` operator do in C++?,Deletes memory,Allocates memory,Prints output,None,B,2
+Which scheduling algorithm gives each process a fixed time slice?,FIFO,Round Robin,SJF,Priority,B,2
+What is a deadlock?,A process finishes execution,Infinite loop,Set of blocked processes,All of these,C,2
+Which is not an OS?,Linux,Windows,C++,macOS,C,1
+In which memory does OS keep active processes?,RAM,Cache,Hard Disk,Register,A,2
+What is the default return type of `main()` in C++?,int,void,char,float,A,1
+Which OS is open-source?,Windows,Linux,macOS,iOS,B,2
+What does `delete` operator do in C++?,Allocates memory,Deallocates memory,Prints data,None,B,1

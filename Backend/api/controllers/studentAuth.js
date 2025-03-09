@@ -84,7 +84,21 @@ const verifyJWT = (req, res, next) => {
         res.status(401).json({ msg: 'Token is not valid' });
     }
 };
-
+// GET student profile (protected)
+router.get('/profile', verifyJWT, async (req, res) => {
+    try {
+      const student = await prisma.studentTable.findUnique({
+        where: { id: req.studentId },
+      });
+      if (!student) {
+        return res.status(404).json({ msg: 'Student not found' });
+      }
+      res.json(student);
+    } catch (error) {
+      console.error('Error fetching student profile:', error);
+      res.status(500).json({ msg: 'Error fetching student profile' });
+    }
+  });
 // Update student profile (protected route)
 router.put('/update', verifyJWT, async (req, res) => {
     const { firstname, lastname, email, PRN, branchId, universityId, yearId } = req.body;

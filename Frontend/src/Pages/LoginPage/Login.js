@@ -33,6 +33,8 @@ const AdvancedLogin = () => {
       console.log("response:" , response);
 
       if (response.status === 200) {
+        localStorage.setItem('token', response.data.token);
+        console.log("token",response.data.token )
         alert("Login successful!");
         if(loginType === 'student'){
           navigate('/student-dashboard');
