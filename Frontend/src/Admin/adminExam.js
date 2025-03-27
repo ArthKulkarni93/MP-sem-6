@@ -1,32 +1,3 @@
-// import React, { useState } from 'react';
-// import { Link } from 'react-router-dom';
-// import AdminSidebar from '../Sidebar/adminSidebar';
-// import { FaBars } from 'react-icons/fa';
-
-// const AdminExam = () => {
-//     const [isOpen, setIsOpen] = useState(false);
-
-//     const toggleSidebar = () => {
-//         setIsOpen(!isOpen);
-//     };
-
-//     return (
-//         <div className="flex h-screen mt-5 bg-gray-100">
-//             <FaBars 
-//                 onClick={toggleSidebar} 
-//                 className="cursor-pointer fixed text-xl text-white ml-1 z-20 hover:text-gray-400" 
-//             />
-//             <AdminSidebar isOpen={isOpen} toggleSidebar={toggleSidebar} role="admin" />
-
-//             <div className="flex-1 p-8">
-                
-//             </div>
-//         </div>
-//     );
-// };
-
-// export default AdminExam;
-
 import React, { useState, useEffect } from 'react';
 import AdminSidebar from '../Sidebar/adminSidebar';
 import { FaBars } from 'react-icons/fa';
@@ -83,14 +54,20 @@ const AdminExam = () => {
       const token = localStorage.getItem('token');
       if (!token) throw new Error("No token found. Please log in.");
 
+      let yearId= parseInt(formData.yearId)
+      let branchId= parseInt(formData.branchId)
+      let duration= parseInt(formData.duration)
+      let totalmarks= parseInt(formData.totalmarks)
+      console.log(yearId, branchId, duration, totalmarks);
+
       const testRes = await axios.post(
         endpoint,
         { 
           ...formData, 
-          yearId: parseInt(formData.yearId),
-          branchId: parseInt(formData.branchId),
-          duration: parseInt(formData.duration),
-          totalmarks: parseInt(formData.totalmarks),
+          yearId: yearId,
+          branchId: branchId,
+          duration: duration,
+          totalmarks: totalmarks,
         },
         {
           headers: {
@@ -163,7 +140,6 @@ const AdminExam = () => {
       const res = await axios.get(questionEndpoint, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log("result: " , res);
       setQuestions(res.data);
       setSelectedTest(testId);
     } catch (error) {
@@ -340,9 +316,9 @@ const AdminExam = () => {
                   <p className="text-gray-500">Subject: {test.subject}</p>
                   <button
                     onClick={() => viewTest(test.id)}
-                    className="mt-2 bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition"
+                    className="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
                   >
-                    View
+                    View Questions
                   </button>
                 </div>
               ))}
@@ -350,28 +326,17 @@ const AdminExam = () => {
           )}
         </div>
 
-        {/* Display Selected Test Questions */}
+        {/* Display questions for the selected test */}
         {selectedTest && (
           <div className="mt-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              Test #{selectedTest} - Questions
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">Questions for Test</h2>
             {questions.length === 0 ? (
-              <p className="text-gray-600">No questions found for this test.</p>
+              <p className="text-gray-600">No questions found.</p>
             ) : (
-              <div className="space-y-4">
-                {questions.map((q, idx) => (
-                  <div key={idx} className="bg-white shadow rounded-lg p-4">
-                    <p className="font-semibold text-gray-700">Q: {q.queText}</p>
-                    <ul className="mt-2 space-y-1 text-gray-600">
-                      <li>A: {q.optionA}</li>
-                      <li>B: {q.optionB}</li>
-                      <li>C: {q.optionC}</li>
-                      <li>D: {q.optionD}</li>
-                    </ul>
-                    <p className="mt-2 text-sm text-gray-500">
-                      Correct Option: {q.correctOption} | Marks: {q.maxMark}
-                    </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {questions.map((question) => (
+                  <div key={question.id} className="bg-white shadow rounded-lg p-4">
+                    <h3 className="text-xl font-semibold text-gray-700">{question.question}</h3>
                   </div>
                 ))}
               </div>

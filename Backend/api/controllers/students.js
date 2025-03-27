@@ -17,47 +17,121 @@ router.get('/tests', verifyJWT('student'), async (req, res) => {
             }
         });
         res.json(tests);
+
+        console.log("Current Date:", now);
+        // console.log("Scheduled Date:", test.scheduledDate);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching tests' });
     }
 });
 
-//submit test
-router.post('/tests/:testId/submit', verifyJWT('student'), async (req, res) => {
-    const { answers } = req.body;
-    let score = 0;
+// //submit test
+// router.post('/tests/:testId/submit', verifyJWT('student'), async (req, res) => {
+//     const { answers } = req.body;
+//     let score = 0;
     
-    try {
-        const questions = await prisma.QuestionsTable.findMany({
-            where: { testId: parseInt(req.params.testId) }
-        });
+//     try {
+//         const questions = await prisma.QuestionsTable.findMany({
+//             where: { testId: parseInt(req.params.testId) }
+//         });
 
-        questions.forEach(question => {
-            const submittedAnswer = answers[question.id]?.toString().trim().toLowerCase();  // Ensure lowercase
-            const correctAnswer = question.correctOption?.toString().trim().toLowerCase(); // Ensure lowercase
+//         questions.forEach(question => {
+//             const submittedAnswer = answers[question.id]?.toString().trim().toLowerCase();  // Ensure lowercase
+//             const correctAnswer = question.correctOption?.toString().trim().toLowerCase(); // Ensure lowercase
             
-            if (submittedAnswer === correctAnswer) {
-                score += question.maxMark;
+//             if (submittedAnswer === correctAnswer) {
+//                 score += question.maxMark;
+//             }
+//         });
+
+//         const result = await prisma.ResultTable.create({
+//             data: {
+//                 testId: parseInt(req.params.testId),
+//                 studentId: req.student.id,
+//                 // totalmarks: questions.reduce((sum, q) => sum + q.maxMark, 0),
+//                 totalmarks: questions.reduce((sum, q) => sum + q.maxMark , 0),
+//                 scoredmarks: score
+//             }
+//         });
+//         res.json(result);
+//         console.log(res);
+//     } catch (error) {
+//         console.error("Error submitting test:", error);
+//         res.status(500).json({ message: 'Error submitting test' });
+//     }
+// });
+
+// Submit Student Test Responses
+router.post('/tests/:testid/submit', verifyJWT('student'), async (req, res) => {
+    const { testid } = req.params;
+    const { answers, security } = req.body;
+
+    // Get student id from the JWT
+    const studentId = req.student.id;
+
+    try {
+        // Save the student's responses and determine if they cheated
+        const responses = Object.keys(answers).map(async (questionId) => {
+            const question = await prisma.QuestionsTable.findUnique({
+                where: { id: parseInt(questionId) }
+            });
+
+            // Determine if the student's answer is correct
+            const isCorrect = question.correctOption === answers[questionId].toUpperCase();
+
+            // Save the response in StudentResponseTable
+            await prisma.StudentResponseTable.create({
+                data: {
+                    studentId: studentId,
+                    testId: parseInt(testid),
+                    questionId: parseInt(questionId),
+                    selectedOption: answers[questionId].toUpperCase(),
+                    isCorrect: isCorrect
+                }
+            });
+        });
+
+        await Promise.all(responses);
+
+        // Calculate whether the student has cheated
+        let cheated = false;
+
+        // Define cheating criteria based on security metrics
+        if (security.tabSwitchCount > 5 || security.fullScreenExits > 2 || security.maxFaceCount > 1) {
+            cheated = true;  // This should properly flag the student as having cheated.
+        }
+
+        // Save the student's result in ResultTable with 'cheated' flag
+        const totalMarks = await prisma.TestTable.findUnique({
+            where: { id: parseInt(testid) },
+            select: { totalmarks: true }
+        });
+
+        // Calculate scored marks based on correct answers
+        const scoredMarks = await prisma.StudentResponseTable.count({
+            where: {
+                studentId: studentId,
+                testId: parseInt(testid),
+                isCorrect: true
             }
         });
 
-        const result = await prisma.ResultTable.create({
+        await prisma.ResultTable.create({
             data: {
-                testId: parseInt(req.params.testId),
-                studentId: req.student.id,
-                // totalmarks: questions.reduce((sum, q) => sum + q.maxMark, 0),
-                totalmarks: questions.reduce((sum, q) => sum + q.maxMark , 0),
-                scoredmarks: score
+                totalmarks: totalMarks.totalmarks,
+                scoredmarks: scoredMarks,
+                cheated: cheated,
+                testId: parseInt(testid),
+                studentId: studentId
             }
         });
-        res.json(result);
-        console.log(res);
+
+        res.status(201).json({ message: 'Test submitted successfully' });
     } catch (error) {
-        console.error("Error submitting test:", error);
+        console.error(error);
         res.status(500).json({ message: 'Error submitting test' });
     }
 });
-
 
 // Get Student's Past Results
 router.get('/results', verifyJWT('student'), async (req, res) => {

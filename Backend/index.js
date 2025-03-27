@@ -4,7 +4,7 @@ const env = require('dotenv');
 const authrouter = require('./api/controllers/auth');
 
 env.config();
-const port = process.env.port
+const port = process.env.PORT
 
 const app = express();
 app.use(express.json());

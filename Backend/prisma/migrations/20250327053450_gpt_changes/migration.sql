@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "YearTable" ALTER COLUMN "branchId" DROP DEFAULT,
+ALTER COLUMN "universityId" DROP DEFAULT;

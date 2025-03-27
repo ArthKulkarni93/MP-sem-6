@@ -10,7 +10,7 @@ const fs = require('fs');
 // Create Test
 router.post('/tests', verifyJWT('teacher'), async (req, res) => {
     const { title, subject, yearId, branchId, scheduledDate, duration, totalmarks } = req.body;
-    
+        
     try {
         const test = await prisma.TestTable.create({
             data: {
@@ -118,5 +118,6 @@ router.get('/tests/:testid/questions', verifyJWT('teacher'), async (req, res) =>
     }
   });
   
+
 
 module.exports = router;

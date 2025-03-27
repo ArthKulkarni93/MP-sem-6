@@ -14,6 +14,7 @@ model UniversityTable {
   branches   BranchTable[]
   students   StudentTable[]
   teachers   TeacherTable[]
+  years     YearTable[]
 }
 
 model BranchTable {
@@ -25,15 +26,23 @@ model BranchTable {
   students    StudentTable[]
   teachers    TeacherTable[]
   tests       TestTable[]
+  years       YearTable[]
 }
 
 model YearTable {
-  id       Int      @id @default(autoincrement())
-  name     String
-  year     Int
-  students StudentTable[]
-  tests    TestTable[]
+  id           Int           @id @default(autoincrement())
+  name         String
+  year         Int
+  universityId Int           // Foreign key to UniversityTable
+  branchId     Int           // Foreign key to BranchTable
+  
+  university   UniversityTable @relation(fields: [universityId], references: [id])
+  branch       BranchTable     @relation(fields: [branchId], references: [id])
+  
+  students     StudentTable[]
+  tests        TestTable[]
 }
+
 
 model StudentTable {
   id           Int      @id @default(autoincrement())
@@ -49,6 +58,7 @@ model StudentTable {
   university   UniversityTable @relation(fields: [universityId], references: [id])
   year         YearTable @relation(fields: [yearId], references: [id])
   results      ResultTable[]
+  responses    StudentResponseTable[]
 }
 
 model TeacherTable {
@@ -72,36 +82,49 @@ model TestTable {
   subject       String
   yearId        Int
   totalmarks    Int
-  duration      Int  // ✅ Added duration (in minutes)
+  duration      Int  // ✅ Duration (in minutes)
   scheduledDate DateTime
   teacher       TeacherTable @relation(fields: [teacherID], references: [id])
   branch        BranchTable  @relation(fields: [branchId], references: [id])
   year          YearTable    @relation(fields: [yearId], references: [id])
   questions     QuestionsTable[]
   results       ResultTable[]
+  responses     StudentResponseTable[]
 }
-
 
 model QuestionsTable {
   id            Int    @id @default(autoincrement())
-  queText       String  // ✅ Updated field name from `question` to `queText`
+  queText       String  // ✅ Question text
   optionA       String
   optionB       String
   optionC       String
   optionD       String
-  correctOption String  // ✅ Storing correct answer as "A", "B", "C", or "D"
-  maxMark       Int     // ✅ Updated from `marks` to `maxMark`
+  correctOption String  // ✅ Correct answer stored as "A", "B", "C", or "D"
+  maxMark       Int     // ✅ Maximum marks for the question
   testId        Int
   test          TestTable @relation(fields: [testId], references: [id])
+  responses     StudentResponseTable[] // ✅ Added missing inverse relation
 }
-
 
 model ResultTable {
   id          Int @id @default(autoincrement())
   totalmarks  Int
   scoredmarks Int
+  cheated     Boolean @default(false) // ✅ Added field to track cheating
   testId      Int
   studentId   Int
   test        TestTable  @relation(fields: [testId], references: [id])
   student     StudentTable @relation(fields: [studentId], references: [id])
+}
+
+model StudentResponseTable {
+  id          Int     @id @default(autoincrement())
+  studentId   Int
+  testId      Int
+  questionId  Int
+  selectedOption String  // ✅ Stores the student's selected answer ("A", "B", "C", "D")
+  isCorrect   Boolean // ✅ Stores whether the selected answer was correct or not
+  student     StudentTable @relation(fields: [studentId], references: [id])
+  test        TestTable @relation(fields: [testId], references: [id])
+  question    QuestionsTable @relation(fields: [questionId], references: [id]) // ✅ Fixed relation
 }

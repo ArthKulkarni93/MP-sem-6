@@ -1,127 +1,97 @@
 import axios from 'axios';
 
-let baseURL = 'http://localhost:5001';
-    
-console.log("url",baseURL);
+const baseURL = 'http://localhost:5001';
 
-const api ={
-    //authentication and autjorization
-    studentSignup : {
-        url:`${baseURL}/api/v1/auth/student/signup`
-    },
-    
-    adminSignup :  {
-        url:`${baseURL}/api/v1/auth/teacher/signup`
-    },
+const api = {
+  // Authentication and Authorization
+  studentSignup: {
+    url: `${baseURL}/api/v1/auth/student/signup`,
+    method: "POST"
+  },
+  adminSignup: {
+    url: `${baseURL}/api/v1/auth/teacher/signup`,
+    method: "POST"
+  },
+  studentSignin: {
+    url: `${baseURL}/api/v1/auth/student/signin`,
+    method: "POST"
+  },
+  adminSignin: {
+    url: `${baseURL}/api/v1/auth/teacher/signin`,
+    method: "POST"
+  },
 
-    studentSignin : {
-        url:`${baseURL}/api/v1/auth/student/signin`
-    },
+  // Profile Fetch
+  studentProfile: {
+    url: `${baseURL}/api/v1/auth/student/profile`,
+    method: "GET"
+  },
+  adminProfile: {
+    url: `${baseURL}/api/v1/auth/teacher/profile`,
+    method: "GET"
+  },
 
-    adminSignin :  {
-        url:`${baseURL}/api/v1/auth/teacher/signin`
-    },
-    // Profile fetch (NEW)
-    studentProfile: {
-        url: `${baseURL}/api/v1/auth/student/profile`
-    },
-    adminProfile: {
-        url: `${baseURL}/api/v1/auth/teacher/profile`
-    },
+  // Profile Update
+  studentUpdate: {
+    url: `${baseURL}/api/v1/auth/student/update`,
+    method: "PUT"
+  },
+  adminUpdate: {
+    url: `${baseURL}/api/v1/auth/teacher/update`,
+    method: "PUT"
+  },
 
-    // Profile update
-    studentUpdate: {
-        url: `${baseURL}/api/v1/auth/student/update`
-    },
-    adminUpdate: {
-        url: `${baseURL}/api/v1/auth/teacher/update`
-    },
-    //test creation
-    createTest : {
-        url: `${baseURL}/api/v1/auth/testTeacher/tests`
-    },
-    //uploading csv file
-    uploadCsv : {
-        url: `${baseURL}/api/v1/auth/testTeacher/tests/:testid/questions`
-    },
-    //getTests for admin
-    getTests : {
-        url: `${baseURL}/api/v1/auth/testTeacher/tests`
-    },
-    //getTests for student
-    getSTests : {
-        url: `${baseURL}/api/v1/auth/testStudent/tests`
-    },
-    //getting results for student
-    getSResults: {
-        url: `${baseURL}/api/v1/auth/testStudent/results`
-    },
-    //get students particular test
-    getSTest: { 
-        url: `${baseURL}/api/v1/auth/testStudent/tests/:testid` 
-    },
-    //get student test questions
-    getSQuestions: { 
-        url: `${baseURL}/api/v1/auth/testStudent/tests/:testid/questions` 
-    },
-    //student submit the test
-    getSTestSubmit: { 
-        url: `${baseURL}/api/v1/auth/testStudent/tests/:testid/submit` 
-    }  
-    // export const studentSignin = (FormData) => api.post('api/v1/auth/student/signin',FormData);
-    // export const adminSignin = (FormData) => api.post('api/v1/auth/teacher/signin',FormData);
-    // export const studentUpdate = (FormData) => api.post('api/v1/auth/student/update',FormData);
-    // export const adminUpdate = (FormData) => api.post('api/v1/auth/teacher/update',FormData);
-    // //test
-    // export const createTest = (FormData) => api.post('api/v1/auth/testTeacher/tests',FormData);
-    // export const uploadCsv = (FormData) => api.post('api/v1/auth/testTeacher/tests/:testid/questions',FormData);
-    // export const getTests = (FormData) => api.post('api/v1/auth/testTeacher/tests',FormData);
-    // export const getResults = (FormData) => api.post('api/v1/auth/testTeacher',FormData);
-}
+  // Test Creation and Management
+  createTest: {
+    url: `${baseURL}/api/v1/auth/testTeacher/tests`,
+    method: "POST"
+  },
+  uploadCsv: {
+    url: `${baseURL}/api/v1/auth/testTeacher/tests/:testid/questions`,
+    method: "POST"
+  },
+  getTests: {
+    url: `${baseURL}/api/v1/auth/testTeacher/tests`,
+    method: "GET"
+  },
+  getSTests: {
+    url: `${baseURL}/api/v1/auth/testStudent/tests`,
+    method: "GET"
+  },
 
-export default api
+  // Results Management
+  getSResults: {
+    url: `${baseURL}/api/v1/auth/testStudent/results`,
+    method: "GET"
+  },
+  getSTest: {
+    url: `${baseURL}/api/v1/auth/testStudent/tests/:testid`,
+    method: "GET"
+  },
+  getSQuestions: {
+    url: `${baseURL}/api/v1/auth/testStudent/tests/:testid/questions`,
+    method: "GET"
+  },
+  getSTestSubmit: {
+    url: `${baseURL}/api/v1/auth/testStudent/tests/:testid/submit`,
+    method: "POST"
+  },
 
+  // New Endpoints for Universities, Branches, and Years
+  fetchUniversities: {
+    url: `${baseURL}/api/v1/auth/universities`,
+    method: "GET"
+  },
+ // Frontend API Update for Fetching Branches
+fetchBranches: {
+    url: `${baseURL}/api/v1/auth/branches/:universityId`,
+    method: "GET"
+  },
+  
+  fetchYears: {
+    url: `${baseURL}/api/v1/auth/years/:universityId/:branchId`,
+    method: "GET"
+  }
+};
 
-
-// import axios from 'axios';
-
-// const baseURL = 'http://localhost:5001';
-
-// const api = {
-//   // Authentication
-//   studentSignup: {
-//     url: `${baseURL}/api/v1/auth/student/signup`
-//   },
-//   adminSignup: {
-//     url: `${baseURL}/api/v1/auth/teacher/signup`
-//   },
-//   studentSignin: {
-//     url: `${baseURL}/api/v1/auth/student/signin`
-//   },
-//   adminSignin: {
-//     url: `${baseURL}/api/v1/auth/teacher/signin`
-//   },
-//   // Profile updates
-//   studentUpdate: {
-//     url: `${baseURL}/api/v1/auth/student/update`
-//   },
-//   adminUpdate: {
-//     url: `${baseURL}/api/v1/auth/teacher/update`
-//   },
-//   // For teachers (not used here)
-//   createTest: {
-//     url: `${baseURL}/api/v1/auth/testTeacher/tests`
-//   },
-//   uploadCsv: {
-//     url: `${baseURL}/api/v1/auth/testTeacher/tests/:testid/questions`
-//   },
-//   // Student endpoints for tests and results:
-//   getTests: {
-//     url: `${baseURL}/api/v1/auth/student/tests`
-//   },
-//   getSResults: {
-//     url: `${baseURL}/api/v1/auth/student/results`
-//   }
-// };
-
-// export default api;
+export default api;

@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../../api";
+import api from "../../api"; // assuming api is set up for your backend URLs
 import { 
   UserCircle2, 
   GraduationCap, 
@@ -12,15 +12,16 @@ import {
   ShieldCheck 
 } from "lucide-react";
 import axios from "axios";
+import Select from 'react-select';
 
 const RoleBasedSignup = () => {
   const [role, setRole] = useState("student");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
-  const [branches, setBranches] = useState([{ id: 1, name: "wce6cs" }]);
-  const [universities, setUniversities] = useState([{ id: 1, name: "Walchand College Of Engineering " }]);
-  const [years, setYears] = useState([{ id: 1, name: "2026" }, { id: 2, name: "SY" }, { id: 3, name: "TY" }]);
+  const [universities, setUniversities] = useState([]);
+  const [branches, setBranches] = useState([]);
+  const [years, setYears] = useState([]);
 
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -35,6 +36,55 @@ const RoleBasedSignup = () => {
     universityId: "",
     yearId: ""
   });
+
+  // Fetch universities on component mount
+  useEffect(() => {
+    const fetchUniversities = async () => {
+      try {
+        const response = await axios.get(api.fetchUniversities.url);
+        setUniversities(response.data);
+      } catch (error) {
+        console.log("Error fetching universities:", error);
+      }
+    };
+    fetchUniversities();
+  }, []);
+
+  // Fetch branches when university is selected
+  useEffect(() => {
+    const fetchBranches = async () => {
+      if (formData.universityId) {
+        try {
+          const response = await axios.get(`${api.fetchBranches.url.replace(':universityId', formData.universityId)}`);
+          setBranches(response.data);
+        } catch (error) {
+          console.error("Error fetching branches:", error);
+        }
+      } else {
+        setBranches([]); // Reset branches if no university is selected
+      }
+    };
+    fetchBranches();
+  }, [formData.universityId]);
+
+  // Fetch years when university and branch are selected
+  useEffect(() => {
+    const fetchYears = async () => {
+      if (formData.universityId && formData.branchId) {
+        try {
+          const response = await axios.get(
+            `${api.fetchYears.url.replace(':universityId', formData.universityId).replace(':branchId', formData.branchId)}`
+          );
+          setYears(response.data);
+        } catch (error) {
+          console.error("Error fetching years:", error);
+        }
+      } else {
+        setYears([]); // Reset years if no university or branch is selected
+      }
+    };
+    fetchYears();
+  }, [formData.universityId, formData.branchId]);
 
   const handleRoleChange = (selectedRole) => {
     setRole(selectedRole);
@@ -57,24 +107,49 @@ const RoleBasedSignup = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleUniversityChange = (selectedOption) => {
+    setFormData(prev => ({ 
+      ...prev, 
+      universityId: selectedOption ? selectedOption.value : "", // Correctly set universityId here
+      branchId: "", // Reset branchId when university changes
+      yearId: "" // Reset yearId when university changes
+    }));
+  };
+
+  const handleBranchChange = (selectedOption) => {
+    setFormData(prev => ({ 
+      ...prev, 
+      branchId: selectedOption ? selectedOption.value : "", // Set only the id, reset if null
+      yearId: "" // Reset yearId when branch changes
+    }));
+  };
+
+  const handleYearChange = (selectedOption) => {
+    setFormData(prev => ({ ...prev, yearId: selectedOption ? selectedOption.value : "" }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData)
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match!");
       return;
     }
-  
+
+    // Prepare data for backend
+    const payload = {
+      ...formData,
+      universityId: parseInt(formData.universityId),
+      branchId: parseInt(formData.branchId),
+      yearId: role === "student" ? parseInt(formData.yearId) : undefined,
+      role
+    };
+
     try {
       const endpoint = role === "student" 
         ? api.studentSignup.url
         : api.adminSignup.url;
-  
-        console.log("endpoint:",endpoint);
 
-      const response = await axios.post(`${endpoint}`, { ...formData, role });
-
-      console.log("response:" , response);
+      const response = await axios.post(endpoint, payload);
 
       if (response.status === 201) {
         alert("Signup successful!");
@@ -123,20 +198,33 @@ const RoleBasedSignup = () => {
 
           {role === "student" && <input type="text" name="PRN" placeholder="PRN Number" value={formData.PRN} onChange={handleChange} required className="w-full border p-2 rounded" />}
 
-          <select name="branchId" value={formData.branchId} onChange={handleChange} required className="w-full border p-2 rounded">
-            <option value="">Select Branch</option>
-            {branches.map(branch => <option key={branch.id} value={branch.id}>{branch.name}</option>)}
-          </select>
+          {/* University Dropdown */}
+          <Select
+            options={universities.map(uni => ({ value: uni.id, label: uni.name }))}
+            onChange={handleUniversityChange}
+            placeholder="Select University"
+            required
+          />
 
-          <select name="universityId" value={formData.universityId} onChange={handleChange} required className="w-full border p-2 rounded">
-            <option value="">Select University</option>
-            {universities.map(uni => <option key={uni.id} value={uni.id}>{uni.name}</option>)}
-          </select>
+          {/* Branch Dropdown */}
+          <Select
+            options={branches.map(branch => ({ value: branch.id, label: branch.Branchname }))}
+            onChange={handleBranchChange}
+            placeholder="Select Branch"
+            isDisabled={!formData.universityId} // Disable if no university is selected
+            required
+          />
 
-          {role === "student" && <select name="yearId" value={formData.yearId} onChange={handleChange} required className="w-full border p-2 rounded">
-            <option value="">Select Year</option>
-            {years.map(year => <option key={year.id} value={year.id}>{year.name}</option>)}
-          </select>}
+          {/* Year Dropdown (only for students) */}
+          {role === "student" && (
+            <Select
+              options={years.map(year => ({ value: year.id, label: year.name }))}
+              onChange={handleYearChange}
+              placeholder="Select Year"
+              isDisabled={!formData.branchId} // Disable if no branch is selected
+              required
+            />
+          )}
 
           {/* Password Field */}
           <div className="flex items-center border p-2 rounded">
@@ -172,7 +260,7 @@ const RoleBasedSignup = () => {
             </button>
           </div>
 
-          <button type="submit" className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700">
+          <button type="submit" className="w-full py-3 bg-blue-600 text-white font-bold rounded-lg">
             Sign Up
           </button>
         </form>
