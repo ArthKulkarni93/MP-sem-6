@@ -31,7 +31,7 @@ const StudentProfilePage = () => {
         const response = await axios.get(GET_PROFILE_URL, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        console.log("profiledata=>" , response);
+        console.log("profiledata=>", response);
         const data = response.data || {};
         setProfile(data);
         setUpdatedProfile(data);
@@ -75,14 +75,17 @@ const StudentProfilePage = () => {
     }
   };
 
-  if (isLoading) return <div className="text-center text-lg font-bold">Loading...</div>;
+  if (isLoading)
+    return <div className="text-center text-lg font-bold">Loading...</div>;
   if (!profile || Object.keys(profile).length === 0)
     return <div className="text-center text-lg font-bold">No profile data found.</div>;
 
   return (
     <div className="min-h-screen mt-5 bg-gray-100">
-      <FaBars onClick={toggleSidebar} 
-      className="cursor-pointer fixed text-xl text-white ml-1 z-20 hover:text-gray-400" />
+      <FaBars
+        onClick={toggleSidebar}
+        className="cursor-pointer fixed text-xl text-white ml-1 z-20 hover:text-gray-400"
+      />
       <StudentSidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
       <div className="container mt-4 mx-auto py-12 px-4">
         <div className="max-w-lg mx-auto bg-white shadow-lg rounded-xl p-8 border border-gray-200 transform hover:scale-105 transition duration-300">
@@ -92,7 +95,10 @@ const StudentProfilePage = () => {
           </div>
           <div className="space-y-6">
             {Object.entries(profile)
-              .filter(([key]) => key.toLowerCase() !== "id")
+              .filter(
+                ([key]) =>
+                  key.toLowerCase() !== "id" && key.toLowerCase() !== "password"
+              )
               .map(([key, value]) => (
                 <div key={key} className="relative">
                   <label className="block text-sm font-medium text-gray-700 capitalize">

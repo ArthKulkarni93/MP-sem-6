@@ -329,14 +329,25 @@ const AdminExam = () => {
         {/* Display questions for the selected test */}
         {selectedTest && (
           <div className="mt-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Questions for Test</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">
+              Test #{selectedTest} - Questions
+            </h2>
             {questions.length === 0 ? (
-              <p className="text-gray-600">No questions found.</p>
+              <p className="text-gray-600">No questions found for this test.</p>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {questions.map((question) => (
-                  <div key={question.id} className="bg-white shadow rounded-lg p-4">
-                    <h3 className="text-xl font-semibold text-gray-700">{question.question}</h3>
+              <div className="space-y-4">
+                {questions.map((q, idx) => (
+                  <div key={idx} className="bg-white shadow rounded-lg p-4">
+                    <p className="font-semibold text-gray-700">Q: {q.queText}</p>
+                    <ul className="mt-2 space-y-1 text-gray-600">
+                      <li>A: {q.optionA}</li>
+                      <li>B: {q.optionB}</li>
+                      <li>C: {q.optionC}</li>
+                      <li>D: {q.optionD}</li>
+                    </ul>
+                    <p className="mt-2 text-sm text-gray-500">
+                      Correct Option: {q.correctOption} | Marks: {q.maxMark}
+                    </p>
                   </div>
                 ))}
               </div>

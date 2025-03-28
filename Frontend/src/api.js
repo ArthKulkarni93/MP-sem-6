@@ -64,6 +64,10 @@ const api = {
     url: `${baseURL}/api/v1/auth/testStudent/results`,
     method: "GET"
   },
+  getTestResults: {
+    url: `${baseURL}/api/v1/auth/testTeacher/tests/:testid/results`,
+    method: "GET"
+  },  
   getSTest: {
     url: `${baseURL}/api/v1/auth/testStudent/tests/:testid`,
     method: "GET"
@@ -91,7 +95,16 @@ fetchBranches: {
   fetchYears: {
     url: `${baseURL}/api/v1/auth/years/:universityId/:branchId`,
     method: "GET"
-  }
+  },
+   // Notes endpoints (new)
+    //admin uploading the notes
+    uploadNotes: { 
+      url: `${baseURL}/api/v1/notes/upload` 
+  },
+    //student getting notes
+    getNotes: { 
+        url: `${baseURL}/api/v1/notes` 
+    }
 };
 
 export default api;

@@ -1,3 +1,4 @@
+
 // src/pages/Profile/adminProfile.js
 import React, { useState, useEffect } from "react";
 import { Edit, Save, User, Mail, Briefcase } from "lucide-react";
@@ -75,8 +76,10 @@ const AdminProfilePage = () => {
 
   return (
     <div className="min-h-screen mt-5 bg-gray-100">
-      <FaBars onClick={toggleSidebar} 
-      className="cursor-pointer fixed text-xl text-white ml-1 z-20 hover:text-gray-400" />
+      <FaBars 
+        onClick={toggleSidebar} 
+        className="cursor-pointer fixed text-xl text-white ml-1 z-20 hover:text-gray-400" 
+      />
       <AdminSidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
       <div className="container mt-4 mx-auto py-12 px-4">
         <div className="max-w-lg mx-auto bg-white shadow-lg rounded-xl p-8 border border-gray-200 transform hover:scale-105 transition duration-300">
@@ -86,7 +89,7 @@ const AdminProfilePage = () => {
           </div>
           <div className="space-y-6">
             {Object.entries(profile)
-              .filter(([key]) => key.toLowerCase() !== "id")
+              .filter(([key]) => key.toLowerCase() !== "id" && key.toLowerCase() !== "password")
               .map(([key, value]) => (
                 <div key={key} className="relative">
                   <label className="block text-sm font-medium text-gray-700 capitalize">

@@ -97,7 +97,7 @@ router.get('/tests/:testId/results', verifyJWT('teacher'), async (req, res) => {
 
         const results = await prisma.ResultTable.findMany({
             where: { testId: test.id },
-            include: { student: { select: { firstname: true, lastname: true, email: true } } }
+            include: { student: { select: {PRN: true, firstname: true, lastname: true, email: true } } }
         });
 
         res.json(results);
