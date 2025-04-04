@@ -140,3 +140,7 @@ router.get('/tests/:testid/questions', verifyJWT('teacher'), async (req, res) =>
 
 
 module.exports = router;
+
+
+//S3 Standard - General purpose storage for any type of data, typically used for frequently accessed data	
+//First 50 TB / Month	$0.023 per GB

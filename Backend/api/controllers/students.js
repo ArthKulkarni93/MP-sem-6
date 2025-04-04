@@ -178,6 +178,51 @@ router.get('/tests/:testid', verifyJWT('student'), async (req, res) => {
       res.status(500).json({ message: 'Error fetching questions for student' });
     }
   });
+
+  router.get('/responses/:testId', verifyJWT('student'), async (req, res) => {
+    const { testId } = req.params;
+    const studentId = req.student?.id;
+ // assuming this is set by verifyJWT middleware
+  
+    try {
+      const responses = await prisma.StudentResponseTable.findMany({
+        where: {
+          testId: parseInt(testId),
+          studentId: parseInt(studentId),
+        },
+        select: {
+          selectedOption: true,
+          isCorrect: true,
+          student: {
+            select: {
+              PRN: true,
+              firstname: true,
+              lastname: true,
+            },
+          },
+          question: {
+            select: {
+              queText: true,
+              correctOption: true,
+              maxMark: true,
+            },
+          },
+        },
+      });
+      
+      if (!responses || responses.length === 0) {
+        return res.status(404).json({ msg: 'No responses found for this test' });
+      }
+    //   console.log(responses);
+  
+      return res.json({ responses });
+    } catch (error) {
+      console.error("Error fetching student responses:", error);
+      return res.status(500).json({ msg: 'An error occurred while fetching responses' });
+    }
+  });
+  
+  
   
 
 module.exports = router;

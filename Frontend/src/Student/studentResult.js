@@ -355,10 +355,13 @@ const StudentResultDetail = ({ result, onBack }) => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setQuestions(res.data);
-      const responseEndpoint = api.getSResponses.url.replace(':testid', testId);
+      console.log("questions: ",res.data);
+      const responseEndpoint = api.getSResponses.url.replace(':testId', testId);
+      console.log("reponseapi: ",responseEndpoint);
       const responsesRes = await axios.get(responseEndpoint, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      console.log(responsesRes);
       const responses = responsesRes.data.responses;
       
       console.log("result1" , res);

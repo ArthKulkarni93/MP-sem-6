@@ -66,7 +66,7 @@ const api = {
   },
   //Student Responses
   getSResponses: {
-    url: `${baseURL}/api/v1/auth/student/responses/:testid`,
+    url: `${baseURL}/api/v1/auth/testStudent/responses/:testId`,
     method: "GET"
   },
     

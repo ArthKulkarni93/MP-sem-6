@@ -66,10 +66,11 @@ router.get('/student/results/:testId', verifyJWT, async (req, res) => {
         res.status(500).json({ msg: 'An error occurred while fetching results' });
     }
 });
-//Route to get responses
+
+//http://localhost:5001/api/v1/auth/student/responses/19
 router.get('/student/responses/:testId', verifyJWT, async (req, res) => {
     const { testId } = req.params;
-    const { studentId } = req; // from JWT
+    const { studentId } = req; // assuming this is set by verifyJWT middleware
   
     try {
       const responses = await prisma.studentResponseTable.findMany({
@@ -78,15 +79,29 @@ router.get('/student/responses/:testId', verifyJWT, async (req, res) => {
           studentId: parseInt(studentId),
         },
         select: {
-          questionId: true,
           selectedOption: true,
           isCorrect: true,
+          student: {
+            select: {
+              PRN: true,
+              firstname: true,
+              lastname: true,
+            },
+          },
+          question: {
+            select: {
+              queText: true,
+              correctOption: true,
+              maxMark: true,
+            },
+          },
         },
       });
-  
+      
       if (!responses || responses.length === 0) {
         return res.status(404).json({ msg: 'No responses found for this test' });
       }
+      console.log(responses);
   
       return res.json({ responses });
     } catch (error) {
@@ -94,6 +109,7 @@ router.get('/student/responses/:testId', verifyJWT, async (req, res) => {
       return res.status(500).json({ msg: 'An error occurred while fetching responses' });
     }
   });
+  
   
 
 
