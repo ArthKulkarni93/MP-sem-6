@@ -66,6 +66,37 @@ router.get('/student/results/:testId', verifyJWT, async (req, res) => {
         res.status(500).json({ msg: 'An error occurred while fetching results' });
     }
 });
+//Route to get responses
+router.get('/student/responses/:testId', verifyJWT, async (req, res) => {
+    const { testId } = req.params;
+    const { studentId } = req; // from JWT
+  
+    try {
+      const responses = await prisma.studentResponseTable.findMany({
+        where: {
+          testId: parseInt(testId),
+          studentId: parseInt(studentId),
+        },
+        select: {
+          questionId: true,
+          selectedOption: true,
+          isCorrect: true,
+        },
+      });
+  
+      if (!responses || responses.length === 0) {
+        return res.status(404).json({ msg: 'No responses found for this test' });
+      }
+  
+      return res.json({ responses });
+    } catch (error) {
+      console.error("Error fetching student responses:", error);
+      return res.status(500).json({ msg: 'An error occurred while fetching responses' });
+    }
+  });
+  
+
+
 
 // Endpoint to get results for tests created by a teacher (Only for teachers)
 router.get('/teacher/results/:testId', verifyJWT, async (req, res) => {
@@ -91,6 +122,10 @@ router.get('/teacher/results/:testId', verifyJWT, async (req, res) => {
                         firstname: true,
                         lastname: true,
                         PRN: true,
+                        cheated: true,              // <--- Make sure to select the 'cheated' field
+                        maxFaceCount: true,         // <--- And the security fields
+                        tabSwitchCount: true,
+                        fullScreenExits: true,
                     },
                 },
             },
@@ -110,4 +145,56 @@ router.get('/teacher/results/:testId', verifyJWT, async (req, res) => {
     }
 });
 
+// // Endpoint to get results for tests created by a teacher (Only for teachers)
+// router.get('/teacher/results/:testId', verifyJWT, async (req, res) => {
+//     const { testId } = req.params;
+//     const { teacherId } = req;
+  
+//     try {
+//       // Check if the test belongs to the teacher
+//       const test = await prisma.testTable.findUnique({
+//         where: { id: parseInt(testId) },
+//         select: { teacher_Id: true, totalmarks: true }
+//       });
+  
+//       if (!test || test.teacher_Id !== teacherId) {
+//         return res.status(403).json({ msg: 'You are not authorized to view these results' });
+//       }
+  
+//       // Fetch results, including cheated and security fields
+//       const results = await prisma.resultTable.findMany({
+//         where: { testId: parseInt(testId) },
+//         select: {
+//           id: true,
+//           studentId: true,
+//           scoredmarks: true,
+//           cheated: true,              // <--- Make sure to select the 'cheated' field
+//           maxFaceCount: true,         // <--- And the security fields
+//           tabSwitchCount: true,
+//           fullScreenExits: true,
+//           student: {
+//             select: {
+//               firstname: true,
+//               lastname: true,
+//               PRN: true,
+//             },
+//           },
+//         },
+//       });
+  
+//       // Map each record to include total marks, scored marks, and a securityDetails object
+//       const resultsWithDetails = results.map((result) => ({
+//         ...result,
+//         totalmarks: test.totalmarks,
+//         // Optionally rename or keep scoredmarks as is
+//         scoredmarks: result.scoredmarks,
+//       }));
+  
+//       res.json(resultsWithDetails);
+//     } catch (error) {
+//       console.error("Error fetching teacher results:", error);
+//       res.status(500).json({ msg: 'An error occurred while fetching results' });
+//     }
+//   });
+  
 module.exports = router;

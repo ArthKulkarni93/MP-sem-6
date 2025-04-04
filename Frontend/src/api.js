@@ -64,6 +64,12 @@ const api = {
     url: `${baseURL}/api/v1/auth/testStudent/results`,
     method: "GET"
   },
+  //Student Responses
+  getSResponses: {
+    url: `${baseURL}/api/v1/auth/student/responses/:testid`,
+    method: "GET"
+  },
+    
   getTestResults: {
     url: `${baseURL}/api/v1/auth/testTeacher/tests/:testid/results`,
     method: "GET"

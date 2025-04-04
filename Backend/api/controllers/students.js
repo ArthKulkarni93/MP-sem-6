@@ -97,7 +97,7 @@ router.post('/tests/:testid/submit', verifyJWT('student'), async (req, res) => {
         let cheated = false;
 
         // Define cheating criteria based on security metrics
-        if (security.tabSwitchCount > 2 || security.fullScreenExits > 2 || security.maxFaceCount > 1) {
+        if (security.tabSwitchCount > 0 || security.fullScreenExits > 0 || security.maxFaceCount > 1) {
             cheated = true;  // This should properly flag the student as having cheated.
         }
 
