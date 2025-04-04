@@ -20,7 +20,7 @@ router.post('/signup', async (req, res) => {
     const { firstname, lastname, email, password, PRN, branchId, universityId, yearId } = req.body;
     console.log("pribt",firstname)
     try {
-        const existingUser = await prisma.studentTable.findFirst({
+        const existingUser = await prisma.StudentTable.findFirst({
             where: { email },
         });
 
@@ -53,7 +53,7 @@ router.post('/signin', async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        const student = await prisma.studentTable.findFirst({
+        const student = await prisma.StudentTable.findFirst({
             where: { email },
         });
 
@@ -87,7 +87,7 @@ const verifyJWT = (req, res, next) => {
 // GET student profile (protected)
 router.get('/profile', verifyJWT, async (req, res) => {
     try {
-      const student = await prisma.studentTable.findUnique({
+      const student = await prisma.StudentTable.findUnique({
         where: { id: req.studentId },
       });
       if (!student) {
@@ -103,7 +103,7 @@ router.get('/profile', verifyJWT, async (req, res) => {
 router.put('/update', verifyJWT, async (req, res) => {
     const { firstname, lastname, email, PRN, branchId, universityId, yearId } = req.body;
     try {
-        const updatedStudent = await prisma.studentTable.update({
+        const updatedStudent = await prisma.StudentTable.update({
             where: { id: req.studentId },
             data: {
                 firstname,

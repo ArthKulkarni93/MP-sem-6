@@ -94,15 +94,34 @@ router.get('/tests/:testId/results', verifyJWT('teacher'), async (req, res) => {
         if (!test || test.teacherID !== req.teacher.id) {
             return res.status(403).json({ message: 'Not authorized to view this test' });
         }
-
+        console.log("inside tests/testid/results1")
         const results = await prisma.ResultTable.findMany({
             where: { testId: test.id },
-            include: { student: { select: {PRN: true, firstname: true, lastname: true, email: true } } }
+            select: {
+                scoredmarks: true,
+                totalmarks: true,
+                cheated: true,
+                tabSwitchCount: true,  // ✅ Now selected from ResultTable
+                fullScreenExits: true, // ✅ Now selected from ResultTable
+                maxFaceCount: true,    // ✅ Now selected from ResultTable
+                student: {
+                    select: {
+                        PRN: true,
+                        firstname: true,
+                        lastname: true,
+                        email: true
+                    }
+                }
+            }
         });
-
+        
+        console.log("inside tests/testid/results2")
         res.json(results);
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching results' });
+        res.status(500).json({ 
+            message: 'Error fetching results',
+            error: error.message
+        });
     }
 });
 // Fetch Questions for a Specific Test

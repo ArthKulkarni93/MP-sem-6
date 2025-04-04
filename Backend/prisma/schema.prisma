@@ -106,15 +106,29 @@ model QuestionsTable {
   responses     StudentResponseTable[] // ✅ Added missing inverse relation
 }
 
+// model ResultTable {
+//   id          Int @id @default(autoincrement())
+//   totalmarks  Int
+//   scoredmarks Int
+//   cheated     Boolean @default(false) // ✅ Added field to track cheating
+//   testId      Int
+//   studentId   Int
+//   test        TestTable  @relation(fields: [testId], references: [id])
+//   student     StudentTable @relation(fields: [studentId], references: [id])
+// }
+
 model ResultTable {
-  id          Int @id @default(autoincrement())
-  totalmarks  Int
-  scoredmarks Int
-  cheated     Boolean @default(false) // ✅ Added field to track cheating
-  testId      Int
-  studentId   Int
-  test        TestTable  @relation(fields: [testId], references: [id])
-  student     StudentTable @relation(fields: [studentId], references: [id])
+  id              Int @id @default(autoincrement())
+  totalmarks      Int
+  scoredmarks     Int
+  cheated         Boolean @default(false) // ✅ Added field to track cheating
+  testId          Int
+  studentId       Int
+  tabSwitchCount  Int @default(0)  // ✅ Added field to track tab switches
+  fullScreenExits Int @default(0)  // ✅ Added field to track fullscreen exits
+  maxFaceCount    Int @default(0)  // ✅ Added field to track max detected faces
+  test            TestTable  @relation(fields: [testId], references: [id])
+  student         StudentTable @relation(fields: [studentId], references: [id])
 }
 
 model StudentResponseTable {

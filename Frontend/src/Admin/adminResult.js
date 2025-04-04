@@ -38,6 +38,7 @@ const AdminResult = () => {
   const handleViewResults = async (test) => {
     try {
       const token = localStorage.getItem('token');
+      console.log(token);
       const endpoint = api.getTestResults.url.replace(':testid', test.id);
       const res = await axios.get(endpoint, {
         headers: { Authorization: `Bearer ${token}` },

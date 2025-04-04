@@ -97,11 +97,11 @@ router.post('/tests/:testid/submit', verifyJWT('student'), async (req, res) => {
         let cheated = false;
 
         // Define cheating criteria based on security metrics
-        if (security.tabSwitchCount > 5 || security.fullScreenExits > 2 || security.maxFaceCount > 1) {
+        if (security.tabSwitchCount > 2 || security.fullScreenExits > 2 || security.maxFaceCount > 1) {
             cheated = true;  // This should properly flag the student as having cheated.
         }
 
-        // Save the student's result in ResultTable with 'cheated' flag
+        // Save the student's result in ResultTable with 'cheated' flag and security metrics
         const totalMarks = await prisma.TestTable.findUnique({
             where: { id: parseInt(testid) },
             select: { totalmarks: true }
@@ -115,6 +115,9 @@ router.post('/tests/:testid/submit', verifyJWT('student'), async (req, res) => {
                 isCorrect: true
             }
         });
+        console.log("security.tabSwitchCount: " ,security.tabSwitchCount)
+        console.log("security.fullScreenExits: " ,security.fullScreenExits)
+        console.log("security.maxFaceCount: " ,security.maxFaceCount)
 
         await prisma.ResultTable.create({
             data: {
@@ -122,7 +125,10 @@ router.post('/tests/:testid/submit', verifyJWT('student'), async (req, res) => {
                 scoredmarks: scoredMarks,
                 cheated: cheated,
                 testId: parseInt(testid),
-                studentId: studentId
+                studentId: studentId,
+                tabSwitchCount: parseInt(security.tabSwitchCount),  // ✅ Storing tab switches
+                fullScreenExits: parseInt(security.fullScreenExits), // ✅ Storing fullscreen exits
+                maxFaceCount: parseInt(security.maxFaceCount)       // ✅ Storing max detected faces
             }
         });
 

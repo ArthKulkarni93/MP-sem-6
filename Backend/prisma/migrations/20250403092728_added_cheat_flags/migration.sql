@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "ResultTable" ADD COLUMN     "fullScreenExits" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "maxFaceCount" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "tabSwitchCount" INTEGER NOT NULL DEFAULT 0;
