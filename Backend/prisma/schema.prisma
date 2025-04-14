@@ -14,7 +14,8 @@ model UniversityTable {
   branches   BranchTable[]
   students   StudentTable[]
   teachers   TeacherTable[]
-  years     YearTable[]
+  years      YearTable[]
+  notes      NotesTable[]
 }
 
 model BranchTable {
@@ -27,6 +28,7 @@ model BranchTable {
   teachers    TeacherTable[]
   tests       TestTable[]
   years       YearTable[]
+  notes       NotesTable[]
 }
 
 model YearTable {
@@ -41,6 +43,7 @@ model YearTable {
   
   students     StudentTable[]
   tests        TestTable[]
+  notes        NotesTable[]
 }
 
 
@@ -72,6 +75,7 @@ model TeacherTable {
   branch       BranchTable @relation(fields: [branchId], references: [id])
   university   UniversityTable @relation(fields: [universityId], references: [id])
   tests        TestTable[]
+  notes        NotesTable[]
 }
 
 model TestTable {
@@ -141,4 +145,22 @@ model StudentResponseTable {
   student     StudentTable @relation(fields: [studentId], references: [id])
   test        TestTable @relation(fields: [testId], references: [id])
   question    QuestionsTable @relation(fields: [questionId], references: [id]) // ✅ Fixed relation
+}
+
+model NotesTable {
+  id           Int      @id @default(autoincrement())
+  title        String
+  description  String
+  driveLink    String
+  uploadedAt   DateTime @default(now())
+
+  teacherId    Int
+  universityId Int
+  branchId     Int
+  yearId       Int
+
+  teacher      TeacherTable     @relation(fields: [teacherId], references: [id])
+  university   UniversityTable  @relation(fields: [universityId], references: [id])
+  branch       BranchTable      @relation(fields: [branchId], references: [id])
+  year         YearTable        @relation(fields: [yearId], references: [id])
 }
