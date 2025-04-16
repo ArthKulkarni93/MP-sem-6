@@ -222,6 +222,33 @@ router.get('/tests/:testid', verifyJWT('student'), async (req, res) => {
     }
   });
   
+  router.get('/notes', verifyJWT('student'), async (req, res) => {
+    try {
+      const student = req.student;
+  
+      const notes = await prisma.NotesTable.findMany({
+        where: {
+          universityId: student.universityId,
+          yearId: student.yearId,
+          branchId: student.branchId,
+        },
+        include: {
+          teacher: {
+            select: {
+              firstname: true,
+              lastname: true,
+              email: true
+            }
+          }
+        }
+      });
+  
+      res.status(200).json(notes);
+    } catch (error) {
+      console.error("error fetching notes:", error);
+      res.status(500).json({ message: 'error fetching notes', error: error.message });
+    }
+  });
   
   
 

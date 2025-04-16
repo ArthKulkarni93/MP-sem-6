@@ -5,11 +5,11 @@ const prisma = new PrismaClient();
 const verifyJWT = (role) => async (req, res, next) => {
     const authHeader = req.headers.authorization;
     if (!authHeader?.startsWith('Bearer ')) return res.sendStatus(401);
-    
+
     const token = authHeader.split(' ')[1];
     try {
         const decoded = jwt.verify(token, process.env.jwtSecret);
-        
+
         if (role === 'teacher') {
             const teacher = await prisma.teacherTable.findUnique({
                 where: { id: decoded.teacherId }
@@ -23,6 +23,10 @@ const verifyJWT = (role) => async (req, res, next) => {
             if (!student) return res.status(403).json({ message: 'Invalid token' });
             req.student = student;
         }
+        
+        // Attach universityId to the request for use by the frontend
+        req.universityId = decoded.universityId;
+
         next();
     } catch (err) {
         return res.status(403).json({ message: 'Invalid token' });

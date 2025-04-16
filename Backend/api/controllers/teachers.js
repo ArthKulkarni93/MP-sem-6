@@ -138,7 +138,66 @@ router.get('/tests/:testid/questions', verifyJWT('teacher'), async (req, res) =>
   });
   
 
+  router.post('/notes', verifyJWT('teacher'), async (req, res) => {
+    try {
+      const { title, description, driveLink, yearid, branchid } = req.body;
+  
+      const teacher = req.teacher; // populated by verifyJWT middleware
+  
+      // Convert IDs to integers and validate them
+      const yearId = parseInt(yearid);
+      const branchId = parseInt(branchid);
+  
+      if (isNaN(yearId) || isNaN(branchId)) {
+        return res.status(400).json({ message: 'Invalid year or branch ID' });
+      }
+  
+      // Fetch year with branch and university to validate ownership
+      const year = await prisma.YearTable.findUnique({
+        where: { id: yearId },
+      });
+  
+      if (!year) {
+        return res.status(404).json({ message: 'Year not found' });
+      }
+  
 
+    //   console.log(year.universityId)
+    //   console.log(teacher.universityId)
+    //   console.log(year.branchId)
+    //   console.log(branchId)
+      if (
+        year.universityId !== teacher.universityId ||
+        year.branchId !== branchId
+      ) {
+        return res.status(403).json({
+          message: 'You are not authorized to upload notes for this year or branch',
+        });
+      }
+  
+      // Create the note
+    //   console.log(title, description, driveLink, yearId, branchId, teacher.universityId)
+      const notes = await prisma.NotesTable.create({
+        data: {
+          title,
+          description,
+          driveLink,
+          yearId: yearId,
+          branchId: branchId,
+          universityId: teacher.universityId,
+          teacherId: teacher.id,
+        },
+      });
+  
+      res.status(201).json({ message: 'Notes uploaded successfully', notes });
+    } catch (error) {
+      console.error('Error uploading notes:', error);
+      res
+        .status(500)
+        .json({ message: 'Error uploading notes', error: error.message });
+    }
+  });
+  
 module.exports = router;
 
 

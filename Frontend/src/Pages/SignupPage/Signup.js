@@ -144,6 +144,9 @@ const RoleBasedSignup = () => {
       role
     };
 
+    // console.log("Final form payload before signup:", payload);
+
+
     try {
       const endpoint = role === "student" 
         ? api.studentSignup.url

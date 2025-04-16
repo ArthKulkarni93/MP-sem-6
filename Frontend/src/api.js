@@ -104,12 +104,14 @@ fetchBranches: {
   },
    // Notes endpoints (new)
     //admin uploading the notes
-    uploadNotes: { 
-      url: `${baseURL}/api/v1/notes/upload` 
-  },
+    uploadNotes: {
+      url: `${baseURL}/api/v1/auth/testTeacher/notes`,
+      method: "POST"
+    },
     //student getting notes
     getNotes: { 
-        url: `${baseURL}/api/v1/notes` 
+        url: `${baseURL}/api/v1/auth/testStudent/notes`,
+        method: "GET"
     }
 };
 

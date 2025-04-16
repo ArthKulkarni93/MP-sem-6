@@ -40,7 +40,7 @@ router.post('/signup', async (req, res) => {
       },
     });
 
-    const token = jwt.sign({ teacherId: teacher.id }, jwtSecret);
+    const token = jwt.sign({ teacherId: teacher.id, universityId: teacher.universityId, }, jwtSecret);
     res.status(201).json({ msg: 'Teacher created successfully', token });
   } catch (error) {
     handleError(res, error);
@@ -60,7 +60,7 @@ router.post('/signin', async (req, res) => {
       return res.status(401).json({ msg: 'Invalid credentials' });
     }
 
-    const token = jwt.sign({ teacherId: teacher.id }, jwtSecret);
+    const token = jwt.sign({ teacherId: teacher.id, universityId: teacher.universityId, }, jwtSecret);
     res.json({ msg: 'Signin successful', token });
   } catch (error) {
     handleError(res, error);
