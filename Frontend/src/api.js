@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseURL = 'https://mp-sem-6-1jkt.onrender.com/';
+const baseURL = 'https://mp-sem-6-1jkt.onrender.com';
 
 const api = {
   // Authentication and Authorization
