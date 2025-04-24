@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "postinstall": "npx prisma generate",
+    "prisma-generate": "PRISMA_GENERATE_BINARY_TARGET=linux npx prisma generate",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
