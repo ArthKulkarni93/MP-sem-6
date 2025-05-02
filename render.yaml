@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: mp-backend
+    env: node
+    rootDir: Backend
+    buildCommand: npm install && npx prisma generate
+    startCommand: node index.js
+    plan: free
+    build:
+      env:
+        NODE_VERSION: 18
