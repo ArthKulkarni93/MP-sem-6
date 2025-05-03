@@ -17,6 +17,11 @@ app.get('/', (req, res) => {
 })
 
 app.use('/api/v1/auth', authrouter);
+app.get('/hello', (req, res) => {
+    res.json({
+        msg: "backend running"
+    })
+})
 
 app.listen(port, () => {
     console.log(`running on ${port}`)

@@ -6,6 +6,16 @@ const multer = require('multer');
 const csv = require('csv-parser');
 const { verifyJWT } = require('../middleware/auth');
 const fs = require('fs');
+const env = require('dotenv');
+const cloudinary = require('cloudinary').v2 
+
+env.config();
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDNAME,
+  api_key: process.env.CLOUDAPIKEY,
+  api_secret: process.env.CLOUDAPISECRET
+})
 
 // Create Test
 router.post('/tests', verifyJWT('teacher'), async (req, res) => {
@@ -35,42 +45,102 @@ router.post('/tests', verifyJWT('teacher'), async (req, res) => {
 // Upload Questions via CSV
 const upload = multer({ dest: 'uploads/' });
 
+const axios = require('axios');
+const streamifier = require('streamifier');
+
+// Upload Questions via CSV (updated to Cloudinary)
 router.post('/tests/:testid/questions', verifyJWT('teacher'), upload.single('file'), async (req, res) => {
     if (!req.file) {
         return res.status(400).json({ message: "no file uploaded. make sure the field name is 'file'." });
     }
 
-    const results = [];
-
-    fs.createReadStream(req.file.path)
-
-        .pipe(csv())
-        .on('data', (data) => {
-            console.log("parsed csv row:", data); // debugging
-
-            results.push({
-                queText: data.queText,  // ✅ ensure exact match with csv
-                optionA: data.optionA,
-                optionB: data.optionB,
-                optionC: data.optionC,
-                optionD: data.optionD,
-                correctOption: data.correctOption.toUpperCase(), // ensure "a", "b", "c", "d"
-                maxMark: parseInt(data.maxMark), // convert to integer
-                testId: parseInt(req.params.testid),
-            });
-        })
-        .on('end', async () => {
-            try {
-                console.log("uploading questions:", results); // debugging
-
-                await prisma.QuestionsTable.createMany({ data: results }); // ✅ Correct model & function
-                res.status(201).json({ message: 'questions uploaded successfully' });
-            } catch (error) {
-                console.error("prisma error:", error.message); // debugging
-                res.status(500).json({ message: 'error uploading questions', error: error.message });
-            }
+    try {
+        // Upload to Cloudinary
+        const cloudinaryResponse = await cloudinary.uploader.upload(req.file.path, {
+            resource_type: 'raw',
+            folder: 'test-csvs'
         });
+
+        console.log("uploaded to cloudinary:", cloudinaryResponse.secure_url);
+
+        // Download file from Cloudinary
+        const response = await axios.get(cloudinaryResponse.secure_url, { responseType: 'stream' });
+
+        const results = [];
+
+        response.data
+            .pipe(csv())
+            .on('data', (data) => {
+                console.log("parsed csv row:", data);
+                results.push({
+                    queText: data.queText,
+                    optionA: data.optionA,
+                    optionB: data.optionB,
+                    optionC: data.optionC,
+                    optionD: data.optionD,
+                    correctOption: data.correctOption.toUpperCase(),
+                    maxMark: parseInt(data.maxMark),
+                    testId: parseInt(req.params.testid),
+                });
+            })
+            .on('end', async () => {
+                try {
+                    console.log("uploading questions:", results);
+                    await prisma.QuestionsTable.createMany({ data: results });
+                    res.status(201).json({ message: 'questions uploaded successfully', cloudinaryUrl: cloudinaryResponse.secure_url });
+                } catch (error) {
+                    console.error("prisma error:", error.message);
+                    res.status(500).json({ message: 'error uploading questions', error: error.message });
+                }
+            });
+    } catch (error) {
+        console.error("error in cloud upload or processing:", error);
+        res.status(500).json({ message: 'error uploading and processing csv', error: error.message });
+    } finally {
+        // Cleanup local file
+        fs.unlink(req.file.path, (err) => {
+            if (err) console.error("error deleting local file:", err);
+            else console.log("local file deleted");
+        });
+    }
 });
+
+// router.post('/tests/:testid/questions', verifyJWT('teacher'), upload.single('file'), async (req, res) => {
+//     if (!req.file) {
+//         return res.status(400).json({ message: "no file uploaded. make sure the field name is 'file'." });
+//     }
+
+//     const results = [];
+
+//     fs.createReadStream(req.file.path)
+
+//         .pipe(csv())
+//         .on('data', (data) => {
+//             console.log("parsed csv row:", data); // debugging
+
+//             results.push({
+//                 queText: data.queText,  // ✅ ensure exact match with csv
+//                 optionA: data.optionA,
+//                 optionB: data.optionB,
+//                 optionC: data.optionC,
+//                 optionD: data.optionD,
+//                 correctOption: data.correctOption.toUpperCase(), // ensure "a", "b", "c", "d"
+//                 maxMark: parseInt(data.maxMark), // convert to integer
+//                 testId: parseInt(req.params.testid),
+//             });
+//         })
+//         .on('end', async () => {
+//             try {
+//                 console.log("uploading questions:", results); // debugging
+
+//                 await prisma.QuestionsTable.createMany({ data: results }); // ✅ Correct model & function
+//                 res.status(201).json({ message: 'questions uploaded successfully' });
+//             } catch (error) {
+//                 console.error("prisma error:", error.message); // debugging
+//                 res.status(500).json({ message: 'error uploading questions', error: error.message });
+//             }
+//         });
+// });
 
 // Get Teacher's Tests
 router.get('/tests', verifyJWT('teacher'), async (req, res) => {
