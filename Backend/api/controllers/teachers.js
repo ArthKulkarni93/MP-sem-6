@@ -105,42 +105,6 @@ router.post('/tests/:testid/questions', verifyJWT('teacher'), upload.single('fil
     }
 });
 
-// router.post('/tests/:testid/questions', verifyJWT('teacher'), upload.single('file'), async (req, res) => {
-//     if (!req.file) {
-//         return res.status(400).json({ message: "no file uploaded. make sure the field name is 'file'." });
-//     }
-
-//     const results = [];
-
-//     fs.createReadStream(req.file.path)
-
-//         .pipe(csv())
-//         .on('data', (data) => {
-//             console.log("parsed csv row:", data); // debugging
-
-//             results.push({
-//                 queText: data.queText,  // ✅ ensure exact match with csv
-//                 optionA: data.optionA,
-//                 optionB: data.optionB,
-//                 optionC: data.optionC,
-//                 optionD: data.optionD,
-//                 correctOption: data.correctOption.toUpperCase(), // ensure "a", "b", "c", "d"
-//                 maxMark: parseInt(data.maxMark), // convert to integer
-//                 testId: parseInt(req.params.testid),
-//             });
-//         })
-//         .on('end', async () => {
-//             try {
-//                 console.log("uploading questions:", results); // debugging
-
-//                 await prisma.QuestionsTable.createMany({ data: results }); // ✅ Correct model & function
-//                 res.status(201).json({ message: 'questions uploaded successfully' });
-//             } catch (error) {
-//                 console.error("prisma error:", error.message); // debugging
-//                 res.status(500).json({ message: 'error uploading questions', error: error.message });
-//             }
-//         });
-// });
 
 // Get Teacher's Tests
 router.get('/tests', verifyJWT('teacher'), async (req, res) => {
@@ -171,9 +135,9 @@ router.get('/tests/:testId/results', verifyJWT('teacher'), async (req, res) => {
                 scoredmarks: true,
                 totalmarks: true,
                 cheated: true,
-                tabSwitchCount: true,  // ✅ Now selected from ResultTable
-                fullScreenExits: true, // ✅ Now selected from ResultTable
-                maxFaceCount: true,    // ✅ Now selected from ResultTable
+                tabSwitchCount: true,  
+                fullScreenExits: true, 
+                maxFaceCount: true,  
                 student: {
                     select: {
                         PRN: true,

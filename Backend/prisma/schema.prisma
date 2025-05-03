@@ -87,7 +87,7 @@ model TestTable {
   subject       String
   yearId        Int
   totalmarks    Int
-  duration      Int  // ✅ Duration (in minutes)
+  duration      Int  
   scheduledDate DateTime
   teacher       TeacherTable @relation(fields: [teacherID], references: [id])
   branch        BranchTable  @relation(fields: [branchId], references: [id])
@@ -99,39 +99,31 @@ model TestTable {
 
 model QuestionsTable {
   id            Int    @id @default(autoincrement())
-  queText       String  // ✅ Question text
+  queText       String  
   optionA       String
   optionB       String
   optionC       String
   optionD       String
-  correctOption String  // ✅ Correct answer stored as "A", "B", "C", or "D"
-  maxMark       Int     // ✅ Maximum marks for the question
+  correctOption String  
+  maxMark       Int    
   testId        Int
   test          TestTable @relation(fields: [testId], references: [id])
-  responses     StudentResponseTable[] // ✅ Added missing inverse relation
+  responses     StudentResponseTable[] 
 }
 
-// model ResultTable {
-//   id          Int @id @default(autoincrement())
-//   totalmarks  Int
-//   scoredmarks Int
-//   cheated     Boolean @default(false) // ✅ Added field to track cheating
-//   testId      Int
-//   studentId   Int
-//   test        TestTable  @relation(fields: [testId], references: [id])
-//   student     StudentTable @relation(fields: [studentId], references: [id])
-// }
+
+
 
 model ResultTable {
   id              Int @id @default(autoincrement())
   totalmarks      Int
   scoredmarks     Int
-  cheated         Boolean @default(false) // ✅ Added field to track cheating
+  cheated         Boolean @default(false) 
   testId          Int
   studentId       Int
-  tabSwitchCount  Int @default(0)  // ✅ Added field to track tab switches
-  fullScreenExits Int @default(0)  // ✅ Added field to track fullscreen exits
-  maxFaceCount    Int @default(0)  // ✅ Added field to track max detected faces
+  tabSwitchCount  Int @default(0)  
+  fullScreenExits Int @default(0)  
+  maxFaceCount    Int @default(0) 
   test            TestTable  @relation(fields: [testId], references: [id])
   student         StudentTable @relation(fields: [studentId], references: [id])
 }
@@ -141,11 +133,11 @@ model StudentResponseTable {
   studentId   Int
   testId      Int
   questionId  Int
-  selectedOption String  // ✅ Stores the student's selected answer ("A", "B", "C", "D")
-  isCorrect   Boolean // ✅ Stores whether the selected answer was correct or not
+  selectedOption String  
+  isCorrect   Boolean 
   student     StudentTable @relation(fields: [studentId], references: [id])
   test        TestTable @relation(fields: [testId], references: [id])
-  question    QuestionsTable @relation(fields: [questionId], references: [id]) // ✅ Fixed relation
+  question    QuestionsTable @relation(fields: [questionId], references: [id]) 
 }
 
 model NotesTable {

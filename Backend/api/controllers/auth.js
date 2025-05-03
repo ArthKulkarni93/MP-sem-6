@@ -1,16 +1,16 @@
 const express = require('express');
-// const prisma = require('@prisma/client');
+
 
 
 const router = express.Router();
 const studentRouter = require('./studentAuth');
 const teacherRouter = require('./teachersAuth');
-const testTeacher = require('./teachers'); // Add this line
+const testTeacher = require('./teachers'); 
 const testStudent = require('./students');
 
 router.use('/student', studentRouter);
 router.use('/teacher', teacherRouter);
-router.use('/testTeacher', testTeacher); // Add this line
+router.use('/testTeacher', testTeacher); 
 router.use('/testStudent', testStudent);
 
 
@@ -19,7 +19,7 @@ const prisma = new PrismaClient();
 
 router.use('/student', studentRouter);
 router.use('/teacher', teacherRouter);
-router.use('/testTeacher', testTeacher); // Add this line
+router.use('/testTeacher', testTeacher); 
 router.use('/testStudent', testStudent);
 
 // Fetch branches by universityId
@@ -35,8 +35,8 @@ router.get('/branches/:universityId', async (req, res) => {
 
   try {
     const branches = await prisma.BranchTable.findMany({
-      where: { universityId: universityIdInt }, // Correcting to use universityId
-      select: { id: true, Branchname: true, Branchcode: true } // Return specific fields
+      where: { universityId: universityIdInt }, 
+      select: { id: true, Branchname: true, Branchcode: true } 
     });
     
     // If no branches found

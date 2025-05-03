@@ -138,8 +138,8 @@ router.get('/teacher/results/:testId', verifyJWT, async (req, res) => {
                         firstname: true,
                         lastname: true,
                         PRN: true,
-                        cheated: true,              // <--- Make sure to select the 'cheated' field
-                        maxFaceCount: true,         // <--- And the security fields
+                        cheated: true,            
+                        maxFaceCount: true,        
                         tabSwitchCount: true,
                         fullScreenExits: true,
                     },
@@ -147,11 +147,11 @@ router.get('/teacher/results/:testId', verifyJWT, async (req, res) => {
             },
         });
 
-        // Add totalmarks and scoredmarks to each result
+
         const resultsWithMarks = results.map(result => ({
             ...result,
             totalmarks: test.totalmarks,
-            scoredmarks: result.scoredmarks // Assuming scoredmarks exists in ResultTable
+            scoredmarks: result.scoredmarks 
         }));
 
         res.json(resultsWithMarks);

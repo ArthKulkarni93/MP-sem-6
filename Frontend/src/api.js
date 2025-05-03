@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-const baseURL = 'https://mp-sem-6-1jkt.onrender.com';
+// const baseURL = 'https://mp-sem-6-1jkt.onrender.com';
 // https://mp-sem-6.onrender.com
 // const baseURL = 'https://mp-sem-6.onrender.com';
 // http://localhost:5001/
-// const baseURL = 'http://localhost:5001';
+const baseURL = 'http://localhost:5001';
 
 const api = {
   // Authentication and Authorization

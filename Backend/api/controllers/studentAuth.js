@@ -12,8 +12,8 @@ const handleError = (res, error) => {
     res.status(500).json({ msg: 'An error occurred' });
 };
 
-// **Security Note:** Replace with a strong, random secret key in a real application
-const jwtSecret =  process.env.jwtSecret// MUST BE SECURE IN PRODUCTION
+
+const jwtSecret =  process.env.jwtSecret
 
 // Student signup route
 router.post('/signup', async (req, res) => {
@@ -57,7 +57,7 @@ router.post('/signin', async (req, res) => {
             where: { email },
         });
 
-        if (!student || student.password !== password) { // Plain text comparison - SECURITY RISK
+        if (!student || student.password !== password) { 
             return res.status(401).json({ msg: 'Invalid credentials' });
         }
 
